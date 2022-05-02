@@ -8,21 +8,19 @@ use_gs_reset = True
 # =====
 
 import mido
-import time
 
 # ignore this >:]
 port = mido.open_output(out_port)
 
-def play(file):
+def gsreset():
+    msg = mido.Message('sysex', data=[65, 16, 66, 18, 0, 0, 127, 0, 1])
+    port.send(msg)
+
+def load(file):
+    return mido.MidiFile(file)
+
+def play(midi_obj):
     # Actually plays MIDI file to implemented port.
     # code will be halted temporary while the file is playing.
-    if use_gs_reset:
-        # Execute GS Reset
-        for msg in mido.MidiFile('midi/system/gsreset.mid').play():
-            port.send(msg)
-        # give a half second to ready
-        time.sleep(.5)
-    # GO!
-    for msg in mido.MidiFile(file).play():
+    for msg in mido.MidiFile(midi_obj).play():
         port.send(msg)
-
