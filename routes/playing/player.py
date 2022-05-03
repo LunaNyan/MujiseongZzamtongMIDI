@@ -1,26 +1,21 @@
-# =====
-# MIDI Out Port Name (e.g. SC-8820:SC-8820 Part A 20:0)
-out_port = ''
-# Send GS Reset before playing the MIDI file?
-# ※ Roland Sound Canvas needs this to play MIDI file properly.
-# default = True
-use_gs_reset = True
-# =====
-
 import mido
+import threading
+import routes.playing.common as common
 
-# ignore this >:]
-port = mido.open_output(out_port)
+# Ignore that "Cannot fine reference" Warning.
+# It works properly if you installed both mido and python-rtmidi.
+porta = mido.open_output('SC-8820:SC-8820 Part A 20:0')
+portb = mido.open_output('SC-8820:SC-8820 Part B 20:1')
 
-def gsreset():
-    msg = mido.Message('sysex', data=[65, 16, 66, 18, 0, 0, 127, 0, 1])
-    port.send(msg)
+def play_portb(mobj):
+    for msg in mobj.play():
+        portb.send(msg)
 
-def load(file):
-    return mido.MidiFile(file)
-
-def play(midi_obj):
-    # Actually plays MIDI file to implemented port.
-    # code will be halted temporary while the file is playing.
-    for msg in mido.MidiFile(midi_obj).play():
-        port.send(msg)
+def play(file):
+    trks = common.negotiate(mido.MidiFile(file))
+    if trks[1] != None:
+        print("file is Dual-Port SMF File")
+        th1 = threading.Thread(target=play_portb, args=([trks[1]]))
+        th1.start()
+    for msg in trks[0].play():
+        porta.send(msg)
