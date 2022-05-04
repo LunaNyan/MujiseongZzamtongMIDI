@@ -4,7 +4,7 @@
 # TODO
 - [ ] MIDI Player Part
   - [x] player itself
-  - [ ] 2 Port MIDI file support
+  - [x] 2 Port MIDI file support
   - [ ] playing status
 - [ ] Webserver
 - [ ] Stream with Icecast2
