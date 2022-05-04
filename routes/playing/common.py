@@ -20,11 +20,6 @@ def negotiate(midi_obj):
                 trk_portA.tracks.append(m1)
             elif port == 1:
                 # It's Port B Track
-                try:
-                    # Fix port prefix
-                    m1.port = 1
-                except:
-                    pass
                 trk_portB.tracks.append(m1)
                 trb_count += 1
             else:
@@ -47,8 +42,16 @@ def negotiate(midi_obj):
         trb2 = mido.MidiTrack()
         for i in trb1:
             try:
-                # fix Port Prefix to prevent loss of instrument setup of Port B
+                # omit SysEx Message to prevent loss of Drum Map of Port B
                 # TODO : calculate timing after SysEx Message to prevent loss of sync
+                if i.data != None:
+                    continue
+                else:
+                    pass
+            except:
+                pass
+            try:
+                # fix Port Prefix to prevent loss of instrument setup of Port B
                 i.port = 1
             except:
                 trb2.append(i)
